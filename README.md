@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Task Manager Web Application
 
 A simple, modern Task Manager application built with **React** (Vite) and **Node.js** (Vercel Serverless Functions).
@@ -75,3 +76,7 @@ To run the frontend and have it proxy API requests to the backend:
 - `POST /api/tasks` - Add a new task
 - `PUT /api/tasks?id=:id` - Toggle task completion
 - `DELETE /api/tasks?id=:id` - Delete a task
+=======
+# Task_manager_Web_application
+Uses React.js (frontend), Uses Node.js (backend logic), Uses REST APIs, Includes UI updates, bug fixing, small modules, Shows real-world product thinking, No advanced backend required
+>>>>>>> 30651c8bbc4d79a2e75b9c068bf92e715bd67270
