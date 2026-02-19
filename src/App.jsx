@@ -1,16 +1,27 @@
 import { useEffect, useState } from "react";
+import "./index.css";
 
 function App() {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/tasks")
-      .then(res => res.json())
-      .then(data => setTasks(data));
+    fetchTasks();
   }, []);
 
+  const fetchTasks = () => {
+    fetch("/api/tasks")
+      .then(res => res.json())
+      .then(data => {
+        setTasks(data);
+        setLoading(false);
+      })
+      .catch(err => console.error("Error fetching tasks:", err));
+  };
+
   const addTask = () => {
+    if (!title.trim()) return;
     fetch("/api/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -41,32 +52,61 @@ function App() {
       .then(() => setTasks(tasks.filter(task => task.id !== id)));
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') addTask();
+  };
+
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="container">
       <h2>Task Manager</h2>
 
-      <input
-        value={title}
-        onChange={e => setTitle(e.target.value)}
-        placeholder="New Task"
-      />
-      <button onClick={addTask}>Add</button>
+      <div className="input-group">
+        <input
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder="What needs to be done?"
+        />
+        <button onClick={addTask}>Add</button>
+      </div>
 
-      <ul>
-        {tasks.map(task => (
-          <li key={task.id}>
-            <span
-              style={{
-                textDecoration: task.completed ? "line-through" : "none"
-              }}
-            >
-              {task.title}
-            </span>
-            <button onClick={() => toggleTask(task.id)}>✔</button>
-            <button onClick={() => deleteTask(task.id)}>❌</button>
-          </li>
-        ))}
-      </ul>
+      {loading ? (
+        <p style={{ textAlign: "center", color: "#888" }}>Loading tasks...</p>
+      ) : (
+        <ul>
+          {tasks.map(task => (
+            <li key={task.id}>
+              <span
+                className={`task-text ${task.completed ? "completed" : ""}`}
+                onClick={() => toggleTask(task.id)}
+              >
+                {task.title}
+              </span>
+              <div className="actions">
+                <button
+                  className="btn-icon btn-check"
+                  onClick={() => toggleTask(task.id)}
+                  title={task.completed ? "Mark as incomplete" : "Mark as complete"}
+                >
+                  {task.completed ? "↩️" : "✅"}
+                </button>
+                <button
+                  className="btn-icon btn-delete"
+                  onClick={() => deleteTask(task.id)}
+                  title="Delete task"
+                >
+                  🗑️
+                </button>
+              </div>
+            </li>
+          ))}
+          {tasks.length === 0 && (
+            <p style={{ textAlign: "center", color: "#888", marginTop: "20px" }}>
+              No tasks yet. Add one above!
+            </p>
+          )}
+        </ul>
+      )}
     </div>
   );
 }
